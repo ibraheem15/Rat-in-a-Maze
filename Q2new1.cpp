@@ -27,13 +27,8 @@ public:
     }
 };
 
-// maze of n*m matrix
-// int n = N, m = M;
-
-// Coordinates of endpoints
-
+// Coordinates of Endpoints
 int endx, endy;
-// bool visited[N][M];
 
 stack<node> isReachable(int **maze, int row, int col)
 {
@@ -48,7 +43,7 @@ stack<node> isReachable(int **maze, int row, int col)
 
     // creating map
     map<pair<int, int>, bool> visited;
-    // setting map to visited
+    // setting map to visited(False)
     for (int i = 0; i < row; i++)
     {
         for (int j = 0; j < col; j++)
@@ -59,7 +54,7 @@ stack<node> isReachable(int **maze, int row, int col)
 
     stack<node> stackk;
 
-    // Initially starting at (0, 0).
+    // Initially pushing (0, 0) in stack
     int i = 0, j = 0;
     node temp(i, j);
 
@@ -70,9 +65,8 @@ stack<node> isReachable(int **maze, int row, int col)
 
         temp = stackk.top();
         int d = temp.dir;
-        
-        i = temp.x, j = temp.y;
 
+        i = temp.x, j = temp.y;
 
         temp.dir++;
         stackk.pop();
@@ -83,53 +77,53 @@ stack<node> isReachable(int **maze, int row, int col)
             return stackk;
         }
 
-        // Checking the Up direction.
+        // Checking the Right direction
         if (d == 0)
-        {
-            if (i - 1 >= 0 && maze[i - 1][j] && !visited[{i - 1, j}])
-            {
-                node temporary(i - 1, j);
-                visited[{i - 1, j}] = true;
-                stackk.push(temporary);
-            }
-        }
-
-        // Checking the left direction
-        else if (d == 1)
-        {
-            if (j - 1 >= 0 && maze[i][j - 1] && !visited[{i, j - 1}])
-            {
-                node temporary(i, j - 1);
-                visited[{i, j - 1}] = true;
-                stackk.push(temporary);
-            }
-        }
-
-        // Checking the down direction
-        else if (d == 2)
-        {
-            if (i + 1 < row && maze[i + 1][j] && !visited[{i + 1, j}])
-            {
-                node temporary(i + 1, j);
-                visited[{i + 1, j}] = true;
-                stackk.push(temporary);
-            }
-        }
-        // Checking the right direction
-        else if (d == 3)
         {
             if (j + 1 < col && maze[i][j + 1] && !visited[{i, j + 1}])
             {
-                node temporary(i, j + 1);
+                node point(i, j + 1);
                 visited[{i, j + 1}] = true;
-                stackk.push(temporary);
+                stackk.push(point);
+            }
+        }
+
+        // Checking the Down direction
+        else if (d == 1)
+        {
+            if (i + 1 < row && maze[i + 1][j] && !visited[{i + 1, j}])
+            {
+                node point(i + 1, j);
+                visited[{i + 1, j}] = true;
+                stackk.push(point);
+            }
+        }
+
+        // Checking the Left direction
+        else if (d == 2)
+        {
+            if (j - 1 >= 0 && maze[i][j - 1] && !visited[{i, j - 1}])
+            {
+                node point(i, j - 1);
+                visited[{i, j - 1}] = true;
+                stackk.push(point);
+            }
+        }
+        // Checking the Up direction
+        else if (d == 3)
+        {
+            if (i - 1 >= 0 && maze[i - 1][j] && !visited[{i - 1, j}])
+            {
+                node point(i - 1, j);
+                visited[{i - 1, j}] = true;
+                stackk.push(point);
             }
         }
 
         // If none of the direction can take
         // the rat to the Food, retract back
         // to the path where the rat came from.
-        else
+        else // come back to previous known point and check other direction and make visited false for points coming back to
         {
             visited[{temp.x, temp.y}] = false;
             stackk.pop();
@@ -155,9 +149,13 @@ void PrintStack(stack<node> s)
     // Pop the top element
     s.pop();
 
-    // Print the current top
-    // of the stack i.e., x
-    cout << "(" << x.x << ',' << x.y << ") ,";
+    // Proceed to put the rest of the stack to stack
+    PrintStack(s);
+
+    if(index==0)
+    {
+        cout << "\nPath is: " << endl;
+    }
     if (index == 4)
     {
         cout << endl;
@@ -165,9 +163,14 @@ void PrintStack(stack<node> s)
     }
     index++;
 
-    // Proceed to print
-    // remaining stack
-    PrintStack(s);
+
+    // Print the current Bottom
+    // of the stack i.e., x
+    cout << "(" << x.x << ',' << x.y << "),";
+    
+    
+
+    
 
     // Push the element back
     s.push(x);
