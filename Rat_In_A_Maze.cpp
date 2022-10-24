@@ -1,6 +1,6 @@
 // CPP program to solve Rat in a maze
 // problem with backtracking using stack
-
+//switched to Without
 #include <cstring>
 #include <iostream>
 #include <fstream>
