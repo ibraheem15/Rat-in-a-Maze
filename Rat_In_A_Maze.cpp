@@ -1,7 +1,7 @@
 // CPP program to solve Rat in a maze
 // problem with backtracking using stack
 
-//Solving without using #include<Stack> and by creating put OWN STACK
+//Solving without using #include<Stack> and by creating our OWN STACK
 #include <cstring>
 #include <iostream>
 #include <fstream>
