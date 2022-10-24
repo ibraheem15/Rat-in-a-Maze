@@ -1,13 +1,14 @@
 // CPP program to solve Rat in a maze
 // problem with backtracking using stack
-//switched to Without Stack Implementaion
+
+//Solving without using #include<Stack> and by creating our OWN STACK
 #include <cstring>
 #include <iostream>
 #include <fstream>
-#include <stack>
 #include <map>
-
 using namespace std;
+
+class node;
 
 class node
 {
@@ -27,10 +28,69 @@ public:
     }
 };
 
-// Coordinates of Endpoints
+class Stack
+{
+public:
+    node *data;
+    Stack()
+    {
+        data = NULL;
+    }
+    void push(node *n)
+    {
+        if (data == NULL)
+        {
+            data = n;
+        }
+        else
+        {
+            n->next = data;
+            data = n;
+        }
+    }
+    node *pop()
+    {
+        if (data == NULL)
+        {
+            return NULL;
+        }
+        else
+        {
+            node *temp = data;
+            data = data->next;
+            return temp;
+        }
+    }
+
+    bool isEmpty()
+    {
+        if (data == NULL)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    node *top()
+    {
+        return data;
+    }
+    void print()
+    {
+        node *temp = data;
+        while (temp != NULL)
+        {
+            cout << temp->x << " " << temp->y << endl;
+            temp = temp->next;
+        }
+    }
+};
+
 int endx, endy;
 
-stack<node> isReachable(int **maze, int row, int col)
+Stack isReachable(int **maze, int row, int col)
 {
     for (int i = 0; i < row; i++)
     {
@@ -43,7 +103,7 @@ stack<node> isReachable(int **maze, int row, int col)
 
     // creating map
     map<pair<int, int>, bool> visited;
-    // setting map to visited(False)
+    // setting map to visited
     for (int i = 0; i < row; i++)
     {
         for (int j = 0; j < col; j++)
@@ -52,81 +112,84 @@ stack<node> isReachable(int **maze, int row, int col)
         }
     }
 
-    stack<node> stackk;
+    // stack<node> stackk;
+    Stack stack;
 
-    // Initially pushing (0, 0) in stack
     int i = 0, j = 0;
-    node temp(i, j);
+    node *n = new node(i, j);
+    // node temp(i, j);
 
-    stackk.push(temp);
+    stack.push(n);
+    stack.print();
+    // stackk.push(temp);
 
-    while (!stackk.empty())
+    while (!stack.isEmpty())
     {
+        node *temp = stack.top();
+        int d = temp->dir;
+        // stackk.pop();
 
-        temp = stackk.top();
-        int d = temp.dir;
+        i = temp->x;
+        j = temp->y;
+        visited[make_pair(i, j)] = true;
 
-        i = temp.x, j = temp.y;
-
-        temp.dir++;
-        stackk.pop();
-        stackk.push(temp);
+        temp->dir++;
+        stack.pop();
+        stack.push(temp);
 
         if (i == endx && j == endy)
         {
-            return stackk;
+            return stack;
         }
 
-        // Checking the Right direction
+        // checking if the next cell is valid
+        // and not visited
         if (d == 0)
         {
             if (j + 1 < col && maze[i][j + 1] && !visited[{i, j + 1}])
             {
-                node point(i, j + 1);
                 visited[{i, j + 1}] = true;
-                stackk.push(point);
+                node *n = new node(i, j + 1);
+                stack.push(n);
             }
         }
 
-        // Checking the Down direction
+        // Checking the left direction //now down
         else if (d == 1)
         {
             if (i + 1 < row && maze[i + 1][j] && !visited[{i + 1, j}])
             {
-                node point(i + 1, j);
                 visited[{i + 1, j}] = true;
-                stackk.push(point);
+                node *n = new node(i + 1, j);
+                stack.push(n);
             }
         }
 
-        // Checking the Left direction
+        // Checking the down direction //now left
         else if (d == 2)
         {
             if (j - 1 >= 0 && maze[i][j - 1] && !visited[{i, j - 1}])
             {
-                node point(i, j - 1);
                 visited[{i, j - 1}] = true;
-                stackk.push(point);
+                node *n = new node(i, j - 1);
+                stack.push(n);
             }
         }
-        // Checking the Up direction
+        // Checking the right direction //converted to up
         else if (d == 3)
         {
             if (i - 1 >= 0 && maze[i - 1][j] && !visited[{i - 1, j}])
             {
-                node point(i - 1, j);
                 visited[{i - 1, j}] = true;
-                stackk.push(point);
+                node *n = new node(i - 1, j);
+                stack.push(n);
             }
         }
 
-        // If none of the direction can take
-        // the rat to the Food, retract back
-        // to the path where the rat came from.
         else // come back to previous known point and check other direction and make visited false for points coming back to
         {
-            visited[{temp.x, temp.y}] = false;
-            stackk.pop();
+            visited[{i, j}] = false;
+            stack.pop();
         }
     }
 
@@ -137,45 +200,30 @@ stack<node> isReachable(int **maze, int row, int col)
 }
 
 int index = 0;
-void PrintStack(stack<node> s)
+void printPath(Stack stack)
 {
-    // If stack is empty
-    if (s.empty())
+    if (stack.isEmpty())
+    {
         return;
-
-    // Extract top of the stack
-    node x = s.top();
-
-    // Pop the top element
-    s.pop();
-
-    // Proceed to put the rest of the stack to stack
-    PrintStack(s);
-
-    if(index==0)
-    {
-        cout << "\nPath is: " << endl;
     }
-    if (index == 4)
+
+    node *temp = stack.data;
+
+    int array[100];
+    while (temp != NULL)
     {
-        cout << endl;
-        index = 0;
+        array[index] = temp->x;
+        index++;
+        array[index] = temp->y;
+        index++;
+        temp = temp->next;
     }
-    index++;
 
-
-    // Print the current Bottom
-    // of the stack i.e., x
-    cout << "(" << x.x << ',' << x.y << "),";
-    
-    
-
-    
-
-    // Push the element back
-    s.push(x);
+    for (int i = index - 1; i >= 0; i -= 2)
+    {
+        cout << "(" << array[i - 1] << ", " << array[i] << ") ";
+    }
 }
-
 // Driver code
 int main()
 {
@@ -234,8 +282,9 @@ int main()
     endx = row - 1;
     endy = col - 1;
 
-    stack<node> bla = (isReachable(Maze, row, col));
-    PrintStack(bla);
+    // stack<node> Path = (isReachable(Maze, row, col));
+    Stack Path = (isReachable(Maze, row, col));
+    printPath(Path);
 
     return 0;
 }
